@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  width: 100vw;
+  background-color: #f5f7fa;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.btn {
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 0.5px solid var(--color-border-secondary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.btn-save {
+  background: orangered;
+  color: #fff;
+  border:1px solid rgb(255, 136, 0);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-export {
+  background: #0eb105;
+  color: white;
+  border:1px solid #dce3ee;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-controller {
+  background: #e2e9f1;
+  color: #64748b;
+  border:1px solid #dce3ee;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background-color: green !important;
+  color: white !important;
+  border: white !important;
+}
+
+.btn-reject:hover {
+  background-color: rgb(226, 112, 112) !important;
+  color: white !important;
+  border: white !important;
+}
