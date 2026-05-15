@@ -5,6 +5,35 @@
 :root {
   width: 100vw;
   background-color: #f5f7fa;
+
+  /* Texto */
+  --color-text-primary: #1a2540;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-text-body: #303644;
+
+  /* Superficies y bordes */
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-strong: #dce3ee;
+
+  /* Acciones (alineado con badges/stats) */
+  --color-success: #0f6e56;
+  --color-success-hover: #0c5a47;
+  --color-success-light: #e1f5ee;
+  --color-success-border: #5dcaa5;
+
+  --color-info: #1e4f8c;
+  --color-info-hover: #163d6e;
+  --color-info-light: #eff6ff;
+  --color-info-border: #bcd4f0;
+
+  --color-danger: #ef4d4d;
+  --color-danger-hover: #cf1e1e;
+  --color-danger-light: #e1f5ee;
+  --color-danger-border: #fa7a7a;
+
 }
 
 * {
@@ -13,52 +42,148 @@
   padding: 0;
 }
 
-.btn {
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 0.5px solid var(--color-border-secondary);
-  color: var(--color-text-secondary);
-  cursor: pointer;
+@layer components {
+  .audit-btn {
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .audit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .audit-btn-sm {
+    padding: 6px 14px;
+  }
+
+  .audit-btn-xs {
+    padding: 4px 10px;
+  }
+
+  /* verify button*/
+  .verify-btn {
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .verify-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .verify-btn-sm {
+    padding: 6px 14px;
+  }
+
+  .verify-btn-xs {
+    padding: 4px 10px;
+  }
+
+  /* Outline — acción principal secundaria (validar) */
+  .audit-btn-outline-success {
+    background: transparent;
+    color: var(--color-success);
+    border: 1px solid var(--color-success-border);
+  }
+
+  .audit-btn-outline-success:hover:not(:disabled) {
+    background: var(--color-success);
+    color: #fff;
+    border-color: var(--color-success);
+  }
+
+  /* Sólido — CTA principal (exportar) */
+  .audit-btn-success {
+    background: var(--color-success);
+    color: #fff;
+    border: 1px solid var(--color-success);
+  }
+
+  .audit-btn-success:hover:not(:disabled) {
+    background: var(--color-success-hover);
+    border-color: var(--color-success-hover);
+  }
+
+  /* Neutro — paginación, filtros */
+  .audit-btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border-strong);
+  }
+
+  .audit-btn-secondary:hover:not(:disabled) {
+    background: var(--color-surface-muted);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+  }
+
+  /* cancel button */
+
+  .cancel-btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+    border: 1px solid var(--color-danger-border);
+  }
+
+  .cancel-btn-outline-danger {
+    background: transparent;
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger-border);
+  }
+
+  .cancel-btn-danger:hover:not(:disabled) {
+    background: var(--color-danger-hover);
+    color: #fff;
+    border-color: var(--color-danger);
+  }
+
+  /* Menú desplegable */
+  .dropdown-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px rgb(26 37 64 / 8%);
+  }
+
+  .dropdown-item {
+    color: var(--color-text-body);
+  }
+
+  .dropdown-item:hover {
+    background: var(--color-surface-muted);
+  }
+
+  .dropdown-item-active {
+    background: var(--color-info-light);
+    color: var(--color-info);
+  }
+
+  .dropdown-item-active:hover {
+    background: var(--color-info-light);
+    color: var(--color-info);
+  }
 }
 
-.btn-save {
-  background: orangered;
-  color: #fff;
-  border:1px solid rgb(255, 136, 0);
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
+/** Oculta barras de scroll pero mantiene el desplazamiento (wheel/trackpad/gesto). */
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
-.btn-export {
-  background: #0eb105;
-  color: white;
-  border:1px solid #dce3ee;
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.btn-controller {
-  background: #e2e9f1;
-  color: #64748b;
-  border:1px solid #dce3ee;
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.btn-confirm:hover {
-  background-color: green !important;
-  color: white !important;
-  border: white !important;
-}
-
-.btn-reject:hover {
-  background-color: rgb(226, 112, 112) !important;
-  color: white !important;
-  border: white !important;
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }

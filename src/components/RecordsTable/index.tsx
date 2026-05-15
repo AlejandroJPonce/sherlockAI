@@ -14,25 +14,40 @@ import { VerifyCell } from "./VerifyCell";
 import { useState, useMemo, useEffect } from "react";
 import { GroupDropdown } from "./GroupDropdown";
 
+/** Clases Tailwind por `column.id` para ocultar celdas en viewport estrechos (mobile-first). */
+const COLUMN_VISIBILITY: Partial<Record<string, string>> = {
+  documento: "hidden sm:table-cell",
+  ciudad: "hidden md:table-cell",
+};
+
+function cellResponsiveClass(columnId: string): string {
+  return COLUMN_VISIBILITY[columnId] ?? "";
+}
+
 export const RecordsTable = ({
   records,
+  verifyingIds,
+  loading,
   onAudioUpload,
   onValidate,
-  verifyingId,
+  onValidateAll,
   handleShowTranscription,
 }: {
   records: AuditRecord[];
+  verifyingIds: Set<string>;
+  loading?: number;
   onAudioUpload: (id: string, file: File) => void;
   onValidate: (id: string) => void;
-  verifyingId: string | null;
+  onValidateAll: () => void;
   handleShowTranscription: (record: AuditRecord) => void;
 }) => {
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [Vall, setVall] = useState(true)
 
   const columnHelper = createColumnHelper<AuditRecord>();
 
-  const columns = [
+  const columns = useMemo(() => [
     columnHelper.accessor("policy", {
       header: () => <div className="flex justify-center w-full">Póliza</div>,
 
@@ -41,7 +56,7 @@ export const RecordsTable = ({
         const record = row.original;
 
         return (
-          <div className="text-[#1a2540] text-center w-[100px] max-w-[100px] line-clamp-1">{record.policy}</div>
+          <div className="text-[#1a2540] text-center w-[4.5rem] max-w-[5.5rem] sm:w-[100px] sm:max-w-[100px] line-clamp-1">{record.policy}</div>
         );
       },
     }),
@@ -52,7 +67,7 @@ export const RecordsTable = ({
         const record = row.original;
 
         return (
-          <div className="text-[#1a2540] w-[220px] max-w-[220px] line-clamp-1">
+          <div className="text-[#1a2540] min-w-[90px] max-w-[140px] sm:min-w-[100px] sm:max-w-[220px] line-clamp-1">
             {record.nombreTitular}
           </div>
         );
@@ -97,7 +112,7 @@ export const RecordsTable = ({
       enableSorting: false,
       cell: ({ row }) => {
         const record = row.original;
-        const isLoading = verifyingId === record.id;
+        const isLoading = verifyingIds.has(record.id);
 
         return (
           <>
@@ -121,19 +136,18 @@ export const RecordsTable = ({
             {!record.similarityScore ? (
               <span className="text-[#cbd5e1]">---------</span>
             ) : (
-              <div className="flex items-center gap-3 w-full min-w-[100px]">
+              <div className="flex items-center gap-1.5 sm:gap-3 w-full min-w-[5.5rem] sm:min-w-[100px]">
                 <div className="w-full h-[10px] rounded-2xl bg-[#e8f2ff]">
                   <div
-                    className={`h-full transition-all rounded-full ${
-                      record.similarityScore < 40
-                        ? "bg-red-600"
-                        : record.similarityScore > 40 &&
-                            record.similarityScore < 90
-                          ? "bg-orange-300"
-                          : record.similarityScore >= 90
-                            ? "bg-green-500"
-                            : ""
-                    }`}
+                    className={`h-full transition-all rounded-full ${record.similarityScore < 40
+                      ? "bg-red-600"
+                      : record.similarityScore > 40 &&
+                        record.similarityScore < 90
+                        ? "bg-orange-300"
+                        : record.similarityScore >= 90
+                          ? "bg-green-500"
+                          : ""
+                      }`}
                     style={{ width: `${record.similarityScore}%` }}
                   />
                 </div>
@@ -197,7 +211,7 @@ export const RecordsTable = ({
         );
       },
     }),
-  ];
+  ], [onAudioUpload, onValidate, handleShowTranscription, verifyingIds]);
 
   const filteredRecords = useMemo(() => {
     return records.filter((rec) => {
@@ -220,15 +234,19 @@ export const RecordsTable = ({
     },
   });
 
+  useEffect(() => {
+    records.some(e => e.audioFile ? setVall(false) : true)
+  }, [records])
+
   return (
     <>
       {!records.length ? (
         <WaitingTable />
       ) : (
-        <div className="h-full flex flex-col rounded-xl">
+        <div className="h-full min-h-0 flex flex-col rounded-xl gap-2 sm:gap-0">
           {/* top-bar-table */}
-          <div className="shrink-0 flex items-center justify-between py-3 bg-transparent">
-            <div className="flex rounded-base">
+          <div className="shrink-0 flex flex-col gap-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:py-3 bg-transparent">
+            <div className="flex min-w-0 rounded-base w-full sm:max-w-xs md:max-w-md">
               <span className="inline-flex items-center px-3 text-sm text-[#303644] bg-neutral-tertiary border rounded-e-0 border-default-medium border-e-0 rounded-s-base">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -248,103 +266,148 @@ export const RecordsTable = ({
               <input
                 type="text"
                 id="website-admin"
-                className="rounded-none rounded-e-base block w-full px-3 py-2.5 bg-white border text-[#303644] text-sm rounded-base placeholder:text-[#999ba3]"
+                className="rounded-none rounded-e-base block min-w-0 flex-1 px-2.5 py-2 sm:px-3 sm:py-2.5 bg-white border text-[#303644] text-sm rounded-base placeholder:text-[#999ba3]"
                 placeholder="Buscar..."
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
 
-            <div className="flex items-center justify-center gap-2">
-              {/* <button className="btn btn-sm btn-cancel text-xs">
-                Validar todos
-              </button> */}
-              <GroupDropdown />
-              <button className="btn btn-active btn-export text-xs">
+            <div className="flex flex-wrap items-stretch justify-end gap-2 w-full sm:w-auto sm:justify-center">
+              <button
+                disabled={Vall}
+                type="button"
+                className="flex flex-1 min-w-[10rem] sm:flex-initial items-center justify-center gap-1 audit-btn audit-btn-sm audit-btn-outline-success disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
+                onClick={onValidateAll}
+              >
+                <span className="truncate">Verificar todos</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className={`size-4 sm:size-5 shrink-0 ${loading && 'loading'}`}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
+                  />
+                </svg>
+              </button>
+              <button type="button" className="audit-btn audit-btn-sm audit-btn-success text-xs sm:text-sm whitespace-nowrap shrink-0">
                 Exportar .xlsx
               </button>
+              <GroupDropdown />
             </div>
           </div>
 
-          {/* table */}
-          <table
-            className="table text-sm overflow-auto"
-            style={{ background: "white", border: "1px solid #e2e8f0" }}
-          >
-            <thead style={{ background: "#f8fafc", borderBottom: "#e2e8f0" }}>
-              <tr className="border-b border-gray-300">
-                <th className="text-xs text-[#94a3b8] uppercase py-3 px-4 text-center w-[70px] max-w-[70px]">
-                  ID
-                </th>
-                {table.getHeaderGroups().map((headerGroup) =>
-                  headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      className="text-xs text-[#94a3b8] uppercase py-3 px-4"
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      <div
-                        className={`flex items-center ${header.id === "similarityScore" ? "justify-center" : ""}`}
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {header.column.getCanSort() &&
-                          (header.column.getIsSorted() === "asc"
-                            ? " ↑"
-                            : header.column.getIsSorted() === "desc"
-                              ? " ↓"
-                              : " ↕")}
-                      </div>
+          {/* Tabla: scroll horizontal en viewports estrechos + columnas progresivas + Titular sticky */}
+          <div className="min-h-0 min-w-0 flex flex-col rounded-lg sm:rounded-xl border border-[#e2e8f0] bg-white overflow-hidden">
+            <div className="scrollbar-none min-h-0 min-w-0 overflow-x-auto overscroll-x-contain [touch-action:pan-x_y]">
+              <table className="table table-auto min-w-max w-full border-collapse text-[0.8125rem] sm:text-sm bg-white text-left">
+                <thead className="bg-[#f8fafc]" style={{ borderBottom: "#e2e8f0" }}>
+                  <tr className="border-b border-gray-300">
+                    <th className="text-[0.65rem] sm:text-xs text-[#94a3b8] uppercase py-2 px-2 sm:py-3 sm:px-3 md:px-4 text-center w-10 min-w-[2.5rem] max-w-[3rem] sm:w-[70px] sm:max-w-[70px] sm:min-w-[70px] sticky left-0 z-30 bg-[#f8fafc]">
+                      ID
                     </th>
-                  )),
-                )}
-              </tr>
-            </thead>
+                    {table.getHeaderGroups().map((headerGroup) =>
+                      headerGroup.headers.map((header) => {
+                        const isTitular = header.column.id === "nombreTitular";
+                        const responsive = cellResponsiveClass(header.column.id);
+                        return (
+                          <th
+                            key={header.id}
+                            className={`text-[0.65rem] sm:text-xs text-[#94a3b8] uppercase py-2 px-2 sm:py-3 sm:px-3 md:px-4 ${responsive} ${header.column.id === "policy"
+                                ? "whitespace-nowrap min-w-[4.5rem] sm:min-w-[100px] sticky left-[2.5rem] sm:left-[70px] z-[28] bg-[#f8fafc]"
+                                : ""
+                              } ${isTitular
+                                ? "sticky left-[7.25rem] sm:left-[170px] md:left-[202px] z-20 min-w-[140px] sm:min-w-[220px] whitespace-nowrap bg-[#f8fafc]"
+                                : ""
+                              }`}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            <div
+                              className={`flex items-center ${header.column.id === "similarityScore" ? "justify-center" : ""}`}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
+                              {header.column.getCanSort() &&
+                                (header.column.getIsSorted() === "asc"
+                                  ? " ↑"
+                                  : header.column.getIsSorted() === "desc"
+                                    ? " ↓"
+                                    : " ↕")}
+                            </div>
+                          </th>
+                        );
+                      }),
+                    )}
+                  </tr>
+                </thead>
 
-            <tbody className="w-full">
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="text-gray-700 border-b border-[#f1f5f9] hover:bg-[#f8fafc] font-light"
-                >
-                  <td className="bg-[#f8fafc] border-r border-[#e2e8f0] py-3 px-4 text-sm text-center">
-                    {parseInt(row.id) + 1}
-                  </td>
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="py-3 px-4 text-sm">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
+                <tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className="group text-gray-700 border-b border-[#f1f5f9] hover:bg-[#f8fafc] font-light"
+                    >
+                      <td className="bg-[#f8fafc] border-r border-[#e2e8f0] py-2 px-2 sm:py-3 sm:px-3 md:px-4 text-[0.8125rem] sm:text-sm text-center whitespace-nowrap w-10 min-w-[2.5rem] sm:min-w-[70px] sticky left-0 z-30">
+                        {parseInt(row.id) + 1}
+                      </td>
+                      {row.getVisibleCells().map((cell) => {
+                        const isTitular = cell.column.id === "nombreTitular";
+                        const responsive = cellResponsiveClass(cell.column.id);
+                        return (
+                          <td
+                            key={cell.id}
+                            className={`py-2 px-2 sm:py-3 sm:px-3 md:px-4 text-[0.8125rem] sm:text-sm align-top ${responsive} ${cell.column.id === "policy"
+                                ? "sticky left-[2.5rem] sm:left-[70px] z-[28] bg-white group-hover:bg-[#f8fafc]"
+                                : ""
+                              } ${isTitular
+                                ? "sticky left-[7.25rem] sm:left-[170px] md:left-[202px] z-20 min-w-[140px] sm:min-w-[220px] whitespace-nowrap bg-white"
+                                : ""
+                              }`}
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </tbody>
+              </table>
+            </div>
 
-          {/* pagination controllers */}
-          <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-[#f8fafc] border border-[#e2e8f0]">
-            <span className="text-xs text-gray-400">
-              Página {table.getState().pagination.pageIndex + 1} de{" "}
-              {table.getPageCount()}
-            </span>
-            <div className="flex gap-2">
-              <button
-                className="btn btn-xs btn-controller"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                ← Anterior
-              </button>
-              <button
-                className="btn btn-xs btn-controller"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                Siguiente →
-              </button>
+            {/* pagination */}
+            <div className="shrink-0 flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between px-3 py-2.5 sm:px-4 sm:py-3 bg-[#f8fafc] border-t border-[#e2e8f0]">
+              <span className="text-xs text-gray-400">
+                Página {table.getState().pagination.pageIndex + 1} de{" "}
+                {table.getPageCount()}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  className="audit-btn audit-btn-xs audit-btn-secondary"
+                  onClick={() => table.previousPage()}
+                  disabled={!table.getCanPreviousPage()}
+                >
+                  ← Anterior
+                </button>
+                <button
+                  type="button"
+                  className="audit-btn audit-btn-xs audit-btn-secondary"
+                  onClick={() => table.nextPage()}
+                  disabled={!table.getCanNextPage()}
+                >
+                  Siguiente →
+                </button>
+              </div>
             </div>
           </div>
         </div>

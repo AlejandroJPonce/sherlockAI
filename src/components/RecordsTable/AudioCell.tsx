@@ -1,15 +1,17 @@
+import React from "react";
+
 import { useRef } from "react";
 import { audioValidationType } from "../../utils/audit.utils";
 import type { AuditRecord } from "../../types/audit.types";
 
 // componente separado para la celda de audio
-export const AudioCell = ({
+export const AudioCell = React.memo(({
   record,
   onAudioUpload,
-}: {
+}: React.PropsWithChildren<{
   record: AuditRecord;
   onAudioUpload: (id: string, file: File) => void;
-}) => {
+}>) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +39,7 @@ export const AudioCell = ({
           </>
         ) : (
           <button
-            className="btn btn-sm"
+            className="audit-btn audit-btn-sm audit-btn-secondary"
             style={{ backgroundColor: "#f8fafc", color: "#94a3b8", border: "1px solid #dce3ee" }}
             onClick={() => inputRef.current?.click()}
           >
@@ -47,4 +49,4 @@ export const AudioCell = ({
       </div>
     </>
   );
-};
+});

@@ -14,15 +14,17 @@ export const VerifyCell = ({
     <>
       <button
         disabled={record.audioStatus == "pending" || loading}
-        className="btn btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center justify-center gap-1 verify-btn verify-btn-sm disabled:opacity-50 disabled:cursor-not-allowed"
         style={{
           backgroundColor: "#eff6ff",
           color: "#2563a8",
           border: "1px solid #e2e8f0",
         }}
         onClick={() => handleValidate(record.id)}
-      >
-        Verificar{" "}
+      ><div>
+        Verificar
+
+      </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

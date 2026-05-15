@@ -14,7 +14,7 @@ export const GroupDropdown = () => {
         <div
           tabIndex={0}
           role="button"
-          className="btn btn-active text-xs border border-gray-600 bg-[#1a2540] text-white flex items-center gap-2"
+          className="audit-btn audit-btn-sm audit-btn-secondary flex items-center gap-1"
         >
           {selected.label}
           <svg
@@ -35,16 +35,16 @@ export const GroupDropdown = () => {
 
         <ul
           tabIndex={0}
-          className="dropdown-content z-10 menu p-1 shadow-lg bg-[#272e36] border border-gray-600 rounded-lg w-48 mt-1"
+          className="dropdown-content dropdown-panel z-10 menu p-1 rounded-lg w-48 mt-1"
         >
           {options.map((option) => (
             <li key={option.value}>
               <button
-                className={`text-xs px-3 py-2 rounded-md w-full text-left
-                ${
+                type="button"
+                className={`audit-btn text-xs px-3 py-2 rounded-md w-full text-left ${
                   selected.value === option.value
-                    ? "bg-[#2563a8] text-white"
-                    : "text-gray-300 hover:bg-gray-700"
+                    ? "dropdown-item-active"
+                    : "dropdown-item"
                 }`}
                 onClick={() => setSelected(option)}
               >

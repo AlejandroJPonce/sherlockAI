@@ -5,3 +5,4 @@ export const REVIEW = 60
 export const REJECTED = 40
 export const MAX_DOC_SIZE = 10 * 1024 * 1024
 export const MAX_AUDIO_SIZE = 25 * 1024 * 1024
+export const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001"

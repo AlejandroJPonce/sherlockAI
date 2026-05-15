@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import "./App.css";
 import { Sidebar } from "./components/Layout/Sidebar";
 import { Topbar } from "./components/Layout/Topbar";
@@ -11,13 +11,11 @@ import { TranscriptionViewer } from "./components/RecordsTable/TrasncriptionView
 
 function App() {
   const [records, setRecords] = useState<AuditRecord[]>([]);
-  const [verifyingId, setVerifyingId] = useState<string | null>(null);
+  const [verifyingIds, setVerifyingIds] = useState<Set<string>>(() => new Set());
   const [showTransModal, setShowTransModal] = useState<boolean>(true);
-  const [selectedRecord, setSelectedRecord] = useState<AuditRecord | null>(
-    null,
-  );
+  const [selectedRecord, setSelectedRecord] = useState<AuditRecord | null>(null,);
 
-  const summary = {
+  const summary = useMemo(() => ({
     total: records.length,
     approved: records.filter((r) => r.approvalStatus === "approved").length,
     rejected: records.filter((r) => r.approvalStatus === "rejected").length,
@@ -25,25 +23,33 @@ function App() {
     pending: records.filter(
       (r) => r.approvalStatus === "pending" && !r.audioFile,
     ).length,
-  };
+  }), [records]);
 
   const handleAudioUpload = (id: string, file: File) => {
-    setRecords((prev) =>
-      prev.map((record) =>
-        record.id === id
-          ? { ...record, audioFile: file, audioStatus: "attached" }
-          : record,
-      ),
-    );
-  };
+    try {
+      setRecords((prev) =>
+        prev.map((record) =>
+          record.id === id
+            ? { ...record, audioFile: file, audioStatus: "attached" }
+            : record,
+        ),
+      );
 
-  const handleValidate = async (id: string) => {
+      console.log('audio subido correctamente');
+    } catch (error) {
+      console.error("Error subiendo audio: ", error);
+    }
+  }
+
+  const handleValidate = useCallback(async (id: string) => {
     const record = records.find((r) => r.id === id);
-    if (!record || !record.audioFile) return;
+    if (!record?.audioFile) return;
 
-    setVerifyingId(id);
+    setVerifyingIds((prev) => {
+      if (prev.has(id)) return prev;
+      return new Set(prev).add(id);
+    });
 
-    // cambiamos el estado de processing
     setRecords((prev) =>
       prev.map((r) => (r.id === id ? { ...r, audioStatus: "processing" } : r)),
     );
@@ -56,13 +62,13 @@ function App() {
           prev.map((r) =>
             r.id === id
               ? {
-                  ...r,
-                  audioStatus: "attached",
-                  similarityScore: result.score,
-                  transcription: result.transcription,
-                  approvalStatus: result.status,
-                  reasoning: result.reasoning,
-                }
+                ...r,
+                audioStatus: "attached",
+                similarityScore: result.score,
+                transcription: result.transcription,
+                approvalStatus: result.status,
+                reasoning: result.reasoning,
+              }
               : r,
           ),
         );
@@ -73,18 +79,26 @@ function App() {
         prev.map((r) => (r.id === id ? { ...r, audioStatus: "attached" } : r)),
       );
     } finally {
-      setVerifyingId(null);
+      setVerifyingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
     }
-  };
+  }, [records]);
 
-  const showTranscriptionModal = (record: AuditRecord) => {
+  const handleValidateAll = useCallback(() => {
+    records.filter((e) => e.audioFile != null ? handleValidate(e.id) : '')
+  }, [])
+
+  const showTranscriptionModal = useCallback((record: AuditRecord) => {
     if (!record) return;
 
     setSelectedRecord(record);
     setShowTransModal(true);
-  };
+  }, []);
 
-  const handleChangeStatus = (id: string, status: approvals) => {
+  const handleChangeStatus = useCallback((id: string, status: approvals) => {
     if (!status || !id) return;
 
     setRecords((prev) =>
@@ -94,7 +108,7 @@ function App() {
     );
 
     setShowTransModal(false)
-  };
+  }, []);
 
   return (
     <>
@@ -113,7 +127,7 @@ function App() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <Topbar />
 
-          <div className="flex-1 flex flex-col overflow-auto p-5 mb-5">
+          <div className="flex-1 flex flex-col overflow-x-hidden p-5 mb-5">
             {!records.length && <UploadZone setRecords={setRecords} />}
 
             <StatsRow summary={summary} />
@@ -123,8 +137,10 @@ function App() {
                 records={records}
                 onAudioUpload={(id, file) => handleAudioUpload(id, file)}
                 onValidate={(id) => handleValidate(id)}
-                verifyingId={verifyingId}
+                verifyingIds={verifyingIds}
                 handleShowTranscription={(e) => showTranscriptionModal(e)}
+                onValidateAll={handleValidateAll}
+                loading={verifyingIds.size}
               />
             </div>
           </div>

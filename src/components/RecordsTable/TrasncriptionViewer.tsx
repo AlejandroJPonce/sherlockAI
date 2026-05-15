@@ -14,7 +14,7 @@ export const TranscriptionViewer = ({
   if (!show || !isRecord) return null;
 
   return (
-    <div className="fixed w-full h-full bg-black/30 z-10">
+    <div className="fixed w-full h-full bg-black/30 z-50">
       <div className="relative flex items-center justify-center w-full h-full">
         <div className="w-[900px] min-h-[200px max-h-[800px] rounded-2xl h-auto bg-white absolute z-20 flex flex-col items-start justify-start shadow-2xl">
           {/* topbar modal */}
@@ -89,12 +89,8 @@ export const TranscriptionViewer = ({
             <div className="flex items-center justify-end gap-2">
               {/* boton rechazar */}
               <button
-                className="btn btn-sm btn-reject shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex flex-1 min-w-[10rem] sm:flex-initial items-center justify-center gap-1 audit-btn audit-btn-sm cancel-btn-danger disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
                 onClick={() => changeStatus(isRecord.id, "rejected")}
-                style={{
-                  backgroundColor: "red",
-                  color: "white",
-                }}
               >
                 Rechazar{" "}
                 <svg
@@ -114,12 +110,8 @@ export const TranscriptionViewer = ({
               </button>
               {/* boton aprobar */}
               <button
-                className="btn btn-sm btn-confirm shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="audit-btn audit-btn-sm audit-btn-success flex inline-block gap-2 text-xs sm:text-sm whitespace-nowrap shrink-0"
                 onClick={() => changeStatus(isRecord.id, "approved")}
-                style={{
-                  backgroundColor: "green",
-                  color: "white",
-                }}
               >
                 Aprobar{" "}
                 <svg
