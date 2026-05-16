@@ -34,8 +34,6 @@ function App() {
             : record,
         ),
       );
-
-      console.log('audio subido correctamente');
     } catch (error) {
       console.error("Error subiendo audio: ", error);
     }
@@ -91,6 +89,15 @@ function App() {
     records.filter((e) => e.audioFile != null ? handleValidate(e.id) : '')
   }, [records])
 
+  const handleDeleteAudioFile = useCallback((id: string) => {
+    if (!id) return
+    setRecords((prev) => 
+      prev.map((r) => 
+        r.id === id ? { ...r, audioFile: null, audioStatus: 'pending', similarityScore: 0 } : r,
+      ),
+    )
+  }, [])
+
   const showTranscriptionModal = useCallback((record: AuditRecord) => {
     if (!record) return;
 
@@ -140,7 +147,7 @@ function App() {
                 verifyingIds={verifyingIds}
                 handleShowTranscription={(e) => showTranscriptionModal(e)}
                 onValidateAll={handleValidateAll}
-                loading={verifyingIds.size}
+                deleteAudioFile={(id) => handleDeleteAudioFile(id)}
               />
             </div>
           </div>
