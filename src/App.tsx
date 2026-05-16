@@ -89,7 +89,7 @@ function App() {
 
   const handleValidateAll = useCallback(() => {
     records.filter((e) => e.audioFile != null ? handleValidate(e.id) : '')
-  }, [])
+  }, [records])
 
   const showTranscriptionModal = useCallback((record: AuditRecord) => {
     if (!record) return;
