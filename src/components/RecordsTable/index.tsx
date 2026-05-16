@@ -27,19 +27,19 @@ function cellResponsiveClass(columnId: string): string {
 export const RecordsTable = ({
   records,
   verifyingIds,
-  loading,
   onAudioUpload,
   onValidate,
   onValidateAll,
   handleShowTranscription,
+  deleteAudioFile
 }: {
   records: AuditRecord[];
   verifyingIds: Set<string>;
-  loading?: number;
   onAudioUpload: (id: string, file: File) => void;
   onValidate: (id: string) => void;
   onValidateAll: () => void;
   handleShowTranscription: (record: AuditRecord) => void;
+  deleteAudioFile: (id: string) => void;
 }) => {
   const [search, setSearch] = useState("");
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -102,6 +102,7 @@ export const RecordsTable = ({
             <AudioCell
               record={record}
               onAudioUpload={(id, file) => onAudioUpload(id, file)}
+              onDeleteAudioFile={(id) => deleteAudioFile(id)}
             />
           </div>
         );
@@ -134,9 +135,11 @@ export const RecordsTable = ({
         return (
           <>
             {!record.similarityScore ? (
-              <span className="text-[#cbd5e1]">---------</span>
+              <div className="text-[#cbd5e1] w-full flex items-center justify-center">
+                <span >---------</span>
+              </div>
             ) : (
-              <div className="flex items-center gap-1.5 sm:gap-3 w-full min-w-[5.5rem] sm:min-w-[100px]">
+              <div className="flex items-center justify-center gap-1.5 sm:gap-3 w-full min-w-[5.5rem] sm:min-w-[100px]">
                 <div className="w-full h-[10px] rounded-2xl bg-[#e8f2ff]">
                   <div
                     className={`h-full transition-all rounded-full ${record.similarityScore < 40
@@ -286,7 +289,7 @@ export const RecordsTable = ({
                   viewBox="0 0 24 24"
                   strokeWidth="1.5"
                   stroke="currentColor"
-                  className={`size-4 sm:size-5 shrink-0 ${loading && 'loading'}`}
+                  className={`size-4 sm:size-5 shrink-0`}
                 >
                   <path
                     strokeLinecap="round"
@@ -319,8 +322,8 @@ export const RecordsTable = ({
                           <th
                             key={header.id}
                             className={`text-[0.65rem] sm:text-xs text-[#94a3b8] uppercase py-2 px-2 sm:py-3 sm:px-3 md:px-4 ${responsive} ${header.column.id === "policy"
-                                ? "whitespace-nowrap min-w-[4.5rem] sm:min-w-[100px] sticky left-[2.5rem] sm:left-[70px] z-[28] bg-[#f8fafc]"
-                                : ""
+                              ? "whitespace-nowrap min-w-[4.5rem] sm:min-w-[100px] sticky left-[2.5rem] sm:left-[70px] z-[28] bg-[#f8fafc]"
+                              : ""
                               } ${isTitular
                                 ? "sticky left-[7.25rem] sm:left-[170px] md:left-[202px] z-20 min-w-[140px] sm:min-w-[220px] whitespace-nowrap bg-[#f8fafc]"
                                 : ""
@@ -363,9 +366,9 @@ export const RecordsTable = ({
                         return (
                           <td
                             key={cell.id}
-                            className={`py-2 px-2 sm:py-3 sm:px-3 md:px-4 text-[0.8125rem] sm:text-sm align-top ${responsive} ${cell.column.id === "policy"
-                                ? "sticky left-[2.5rem] sm:left-[70px] z-[28] bg-white group-hover:bg-[#f8fafc]"
-                                : ""
+                            className={`py-2 px-2 sm:py-3 sm:px-3 md:px-4 text-[0.8125rem] sm:text-sm ${responsive} ${cell.column.id === "policy"
+                              ? "sticky left-[2.5rem] sm:left-[70px] z-[28] sm:bg-white group-hover:bg-[#f8fafc]"
+                              : ""
                               } ${isTitular
                                 ? "sticky left-[7.25rem] sm:left-[170px] md:left-[202px] z-20 min-w-[140px] sm:min-w-[220px] whitespace-nowrap bg-white"
                                 : ""
