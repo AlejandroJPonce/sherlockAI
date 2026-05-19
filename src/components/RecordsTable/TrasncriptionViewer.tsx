@@ -9,9 +9,24 @@ export const TranscriptionViewer = ({
   isRecord: AuditRecord | null
   show: boolean;
   handleClose: () => void;
-  changeStatus: (id:string, status: approvals) => void
+  changeStatus: (id: string, status: approvals) => void
 }) => {
   if (!show || !isRecord) return null;
+
+  const styles = {
+    pending: "bg-[#fef9ec] text-[#854F0B] border-[#f0c87a] border",
+    approved: "bg-[#E1F5EE] text-[#085041] border-[#5DCAA5] border",
+    rejected: "bg-[#FCEBEB] text-[#791F1F] border-[#F09595] border",
+    review: "bg-[#eff6ff] text-[#1e4f8c] border-[#bcd4f0] border",
+  } as const;
+
+  const labels = {
+    pending: "Pendiente",
+    approved: "Aprobado",
+    rejected: "Rechazado",
+    review: "Revisar",
+  } as const;
+
 
   return (
     <div className="fixed w-full h-full bg-black/30 z-50">
@@ -24,10 +39,11 @@ export const TranscriptionViewer = ({
           >
             <div className="flex items-center justify-between cursor-pointer w-full">
               <div>
-                <span>
-                  Transcripción por la <span className="font-bold"> IA </span>{" "}
-                  <div className="badge badge-pending ml-3">{isRecord.approvalStatus}</div>
-                </span>
+                <span> Transcripción por la <span className="font-bold"> IA </span>{" "}  <span
+                    className={`text-xs font-medium px-3 py-1 rounded-full ml-4  ${styles[isRecord.approvalStatus as keyof typeof styles]}`}
+                  >
+                    {labels[isRecord.approvalStatus as keyof typeof labels]}
+                  </span></span>
               </div>
               <div onClick={handleClose}>
                 <svg

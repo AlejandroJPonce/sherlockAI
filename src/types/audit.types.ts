@@ -1,5 +1,6 @@
 export type AuditRecord = {
   id: string
+  isVerified?: boolean
   policy: string
   nombreTitular: string
   documento: string

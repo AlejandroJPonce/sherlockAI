@@ -35,7 +35,7 @@ export const AudioCell = React.memo(({
       <div className="min-h-[40px] flex items-center justify-start gap-3">
         {record.audioStatus == "attached" || record.audioStatus == "processing" ? (
           <>
-            <div className="flex items-center justify-between gap-6 bg-[#E1F5EE] py-[2px] px-4 rounded-full text-xs text-[#085041] text-center border border-[#5DCAA5]">
+            <div className="flex items-center justify-between gap-6 bg-[#E1F5EE] py-[5px] px-4 rounded-full text-xs text-[#085041] text-center border border-[#5DCAA5]">
               {record.audioStatus === "attached" ? "✓ Adjunto" : record.audioStatus === "processing" ? 'Procesando...' : ''}
             </div>
             {
