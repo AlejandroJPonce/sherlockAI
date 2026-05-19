@@ -187,7 +187,7 @@ export const RecordsTable = ({
       },
     }),
     columnHelper.accessor("approvalStatus", {
-      header: "Estado",
+      header: () => <div className="flex justify-center w-full">Estado</div>,
       enableSorting: false,
       cell: ({ getValue }) => {
         const status = getValue();
@@ -206,11 +206,15 @@ export const RecordsTable = ({
         } as const;
 
         return (
-          <span
-            className={`text-xs font-medium px-3 py-1 rounded-full ${styles[status as keyof typeof styles]}`}
+          <div className="w-full flex items-center justify-center">
+            <span
+            className={`text-xs font-medium px-3 py-1 rounded-full w-[100%] text-center ${styles[status as keyof typeof styles]}`}
           >
             {labels[status as keyof typeof labels]}
           </span>
+
+          </div>
+          
         );
       },
     }),

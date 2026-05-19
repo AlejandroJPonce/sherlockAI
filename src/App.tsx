@@ -133,7 +133,7 @@ function App() {
         <Sidebar />
 
         <div className="flex-1 flex flex-col overflow-hidden">
-          <Topbar />
+          <Topbar activeGroup="Voy - Asistencias" />
 
           <div className="flex-1 flex flex-col overflow-x-hidden p-5 mb-5">
             {!records.length && <UploadZone setRecords={setRecords} />}
