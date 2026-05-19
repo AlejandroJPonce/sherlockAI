@@ -61,6 +61,7 @@ function App() {
             r.id === id
               ? {
                 ...r,
+                isVerified: true,
                 audioStatus: "attached",
                 similarityScore: result.score,
                 transcription: result.transcription,
@@ -86,14 +87,14 @@ function App() {
   }, [records]);
 
   const handleValidateAll = useCallback(() => {
-    records.filter((e) => e.audioFile != null ? handleValidate(e.id) : '')
+    records.filter((e) => e.audioFile != null && !e.isVerified ? handleValidate(e.id) : '')
   }, [records])
 
   const handleDeleteAudioFile = useCallback((id: string) => {
     if (!id) return
     setRecords((prev) => 
       prev.map((r) => 
-        r.id === id ? { ...r, audioFile: null, audioStatus: 'pending', similarityScore: 0 } : r,
+        r.id === id ? { ...r, audioFile: null, audioStatus: 'pending', similarityScore: 0, isVerified: false } : r,
       ),
     )
   }, [])

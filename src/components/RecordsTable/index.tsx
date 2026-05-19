@@ -109,7 +109,7 @@ export const RecordsTable = ({
       },
     }),
     columnHelper.accessor("actions", {
-      header: "Acciones",
+      header: () => <div className="flex justify-center w-full">Acciones</div>,
       enableSorting: false,
       cell: ({ row }) => {
         const record = row.original;
